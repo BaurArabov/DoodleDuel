@@ -1,11 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 
-const SketchCanvas = ({ coordinates }) => {
+const SketchCanvas = () => {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [drawingData, setDrawingData] = useState(null);
   const [category, setCategory] = useState(null);
+  const [coordinates, setCoordinates] = useState("");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -29,6 +30,8 @@ const SketchCanvas = ({ coordinates }) => {
         }
         currentCoordinatesIndex++;
         setTimeout(animateDrawing, 50); // Add a delay of 50 milliseconds between each coordinate drawing
+
+        // handleClassify();
       } else {
         setDrawing(false);
       }
@@ -90,10 +93,10 @@ const SketchCanvas = ({ coordinates }) => {
 
   const handleClassify = async () => {
     const drawingData = getDataURL(); // Call the getDataURL function to get the URL before sending the request
-    console.log("url of the image" + drawingData);
+    // console.log("url of the image" + drawingData);
     try {
       const response = await axios.post(
-        "http://localhost:8000/recognize",
+        "http://localhost:8000/recognizee",
         null,
         {
           params: {
@@ -111,26 +114,51 @@ const SketchCanvas = ({ coordinates }) => {
   const handleGenerate = async () => {
     try {
       const response = await axios.post("http://localhost:8000/generate");
-      console.log(response.data);
-      // Assuming the response contains a "category" field and the data is structured as { "category_name": [coordinates] }
-      const category = response.data["category_name"];
-      setCategory(category);
+      console.log(response.data.bus[0]);
+      setCoordinates(response.data.train[1]);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const getHeight = window.outerHeight * 0.5;
+  const getWidth = window.outerWidth * 0.48;
+
   return (
-    <div>
-      <canvas
-        ref={canvasRef}
-        width={512} // Set the canvas size to match the sketch size
-        height={512}
-        style={{ border: "1px solid black" }}
-      />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        paddingTop: "80px",
+      }}
+    >
+      <p
+        style={{
+          fontFamily: "Open Sans",
+          fontSize: "30px",
+          color: "#333",
+          fontWeight: "bold",
+        }}
+      >
+        AI
+      </p>
+      <div style={{ marginRight: "20px" }}>
+        <canvas
+          ref={canvasRef}
+          width={getWidth}
+          height={getHeight}
+          style={{
+            width: { getWidth },
+            border: "3px solid black",
+            borderRadius: "15px",
+          }}
+        />
+      </div>
       <button onClick={startDrawing}>Start Drawing</button>
       <button onClick={handleClassify}>Classify</button>
       <button onClick={handleGenerate}>Geneerate</button>
+      {category && <p>Predicted Category: {category}</p>}
     </div>
   );
 };

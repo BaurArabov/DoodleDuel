@@ -237,8 +237,8 @@ function Canvas() {
   // const getHeight = window.outerHeight * 0.6;
   // const getWidth = window.outerWidth * 0.55;
 
-  const getHeight = window.outerHeight * 0.35;
-  const getWidth = window.outerWidth * 0.3;
+  const getHeight = window.outerHeight * 0.5;
+  const getWidth = window.outerWidth * 0.48;
 
   const [sketchCategory, setCategory] = useState("");
 
@@ -280,10 +280,16 @@ function Canvas() {
             fontWeight: "bold",
           }}
         >
-          Canvas
+          User
         </p>
 
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           {isThereSmthOnCanvas && (
             <Button
               variant="outlined"
@@ -326,88 +332,75 @@ function Canvas() {
           </div>
 
           <div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div
+            <div style={{ display: "flex" }}>
+              <Button
+                variant="text"
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  border: "2px",
+                }}
+                onClick={undoLastChange}
+              >
+                Undo
+              </Button>
+              <Button
+                variant="text"
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                }}
+                onClick={clearCanvas}
+              >
+                Clear
+              </Button>
+
+              <Button
+                variant="text"
+                onClick={getDataURL}
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  color: "red",
                 }}
               >
-                <Button
-                  variant="text"
-                  style={{
-                    marginBottom: "10px",
-                    fontWeight: "bold",
-                    fontSize: "18px",
-                    border: "2px",
-                  }}
-                  onClick={undoLastChange}
-                >
-                  Undo
-                </Button>
-                <Button
-                  variant="text"
-                  style={{
-                    marginBottom: "10px",
-                    fontWeight: "bold",
-                    fontSize: "18px",
-                  }}
-                  onClick={clearCanvas}
-                >
-                  Clear
-                </Button>
-              </div>
+                Get image
+              </Button>
+              <Button
+                variant="text"
+                onClick={handleClassify}
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  color: "red",
+                }}
+              >
+                Classsify
+              </Button>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                style={{
+                  border: "2px solid #ccc",
+                  borderRadius: "5px",
+                  padding: "3px",
+                }}
+              />
 
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  style={{
-                    border: "2px solid #ccc",
-                    borderRadius: "5px",
-                    padding: "3px",
-                  }}
-                />
-
-                <Slider
-                  sx={{ height: 300, marginLeft: "10px" }}
-                  orientation="vertical"
-                  aria-label="Temperature"
-                  defaultValue={5}
-                  valueLabelDisplay="auto"
-                  onChange={(e) => setBrushSize(Number(e.target.value))}
-                  step={5}
-                  marks
-                  min={5}
-                  max={100}
-                />
-              </div>
-
-              <div style={{ marginTop: "10px" }}>
-                <Button
-                  variant="text"
-                  onClick={getDataURL}
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: "18px",
-                  }}
-                >
-                  Get image
-                </Button>
-                <Button
-                  variant="text"
-                  onClick={handleClassify}
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: "18px",
-                  }}
-                >
-                  Classsify
-                </Button>
-              </div>
+              <Slider
+                sx={{ marginLeft: "10px" }}
+                aria-label="Temperature"
+                defaultValue={5}
+                valueLabelDisplay="auto"
+                onChange={(e) => setBrushSize(Number(e.target.value))}
+                step={5}
+                marks
+                min={5}
+                max={100}
+              />
             </div>
           </div>
         </div>
@@ -416,7 +409,7 @@ function Canvas() {
           {sketchCategory && <p>Predicted Category: {sketchCategory}</p>}
           {/* <ImageUploader onImageUpload={handleImageUpload} /> */}
         </div>
-        {/* {isThereImage && <img src={`${drawingData}`} alt="" />} */}
+        {isThereImage && <img src={`${drawingData}`} alt="" />}
       </div>
     </ThemeProvider>
   );

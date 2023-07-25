@@ -1,6 +1,8 @@
 import React from "react";
 import Canvas from "../Canvas/Canvas";
 import LeftPanel from "../LeftPanel/LeftPanel";
+import SketchCanvas from "../SketchCanvas/SketchCanvas";
+import WordSlotMachine from "../WordSlotMachine/WordSlotMachine";
 import "./ObjectToDraw.css";
 
 const ObjectToDraw = ({ object }) => {
@@ -45,8 +47,12 @@ const ObjectToDraw = ({ object }) => {
             margin: "18px",
           }}
         >
-          <h3>Draw: {object}</h3>
-          <Canvas />
+          {/* <h3 style={{ margin: "0" }}>Draw: {object}</h3> */}
+          <WordSlotMachine />
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Canvas />
+            <SketchCanvas />
+          </div>
         </div>
       </div>
     </div>
