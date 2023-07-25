@@ -1,7 +1,7 @@
 import { Button, Slider } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import ImageUploader from "../ImageUploader/ImageUploader";
 
 const theme = createTheme({
   palette: {
@@ -40,6 +40,8 @@ function Canvas() {
 
     const currentLine = historyRef.current[historyRef.current.length - 1];
     currentLine.push({ x: point.x, y: point.y });
+
+    // handleClassify();
   }
 
   function clearCanvas() {
@@ -191,8 +193,22 @@ function Canvas() {
       if (!isThereSmthOnCanvas) alert("Draw something");
       return;
     }
-    setDrawingData(canvasElement.toDataURL("image/png"));
 
+    // Create a new canvas with white background
+    const newCanvas = document.createElement("canvas");
+    newCanvas.width = canvasElement.width;
+    newCanvas.height = canvasElement.height;
+    const newCanvasContext = newCanvas.getContext("2d");
+    newCanvasContext.fillStyle = "white";
+    newCanvasContext.fillRect(0, 0, newCanvas.width, newCanvas.height);
+
+    // Draw the original canvas on the new canvas
+    newCanvasContext.drawImage(canvasElement, 0, 0);
+
+    // Convert the new canvas to a data URL with image/jpeg format
+    const dataURL = newCanvas.toDataURL("image/jpeg");
+    console.log(dataURL);
+    setDrawingData(dataURL);
     setThereImage(true);
   };
 
@@ -218,10 +234,33 @@ function Canvas() {
     };
   };
 
-  const getHeight = window.outerHeight * 0.6;
-  const getWidth = window.outerWidth * 0.55;
-  // const getHeight = window.outerHeight * 0.4;
-  // const getWidth = window.outerWidth * 0.4;
+  // const getHeight = window.outerHeight * 0.6;
+  // const getWidth = window.outerWidth * 0.55;
+
+  const getHeight = window.outerHeight * 0.35;
+  const getWidth = window.outerWidth * 0.3;
+
+  const [sketchCategory, setCategory] = useState("");
+
+  const handleClassify = async () => {
+    getDataURL();
+    console.log("url of the image" + drawingData);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/recognize",
+        null,
+        {
+          params: {
+            image_data_url: drawingData,
+          },
+        }
+      );
+      console.log(response.data);
+      setCategory(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -358,15 +397,26 @@ function Canvas() {
                 >
                   Get image
                 </Button>
+                <Button
+                  variant="text"
+                  onClick={handleClassify}
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
+                  Classsify
+                </Button>
               </div>
             </div>
           </div>
         </div>
         <div style={{}}>
           {/* Add the ImageUploader component */}
-          <ImageUploader onImageUpload={handleImageUpload} />
+          {sketchCategory && <p>Predicted Category: {sketchCategory}</p>}
+          {/* <ImageUploader onImageUpload={handleImageUpload} /> */}
         </div>
-        {isThereImage && <img src={`${drawingData}`} alt="" />}
+        {/* {isThereImage && <img src={`${drawingData}`} alt="" />} */}
       </div>
     </ThemeProvider>
   );

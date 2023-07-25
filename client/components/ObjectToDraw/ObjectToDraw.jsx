@@ -1,20 +1,19 @@
-import Button from "@mui/material/Button";
-import React, { useState } from "react";
+import React from "react";
 import Canvas from "../Canvas/Canvas";
 import LeftPanel from "../LeftPanel/LeftPanel";
 import "./ObjectToDraw.css";
 
 const ObjectToDraw = ({ object }) => {
-  const [isPanelOpen, setIsPanelOpen] = useState(false); // Track panel open/closed state
+  // const [isPanelOpen, setIsPanelOpen] = useState(false); // Track panel open/closed state
 
-  const handleTogglePanel = () => {
-    setIsPanelOpen((prevState) => !prevState); // Toggle the panel open/closed state
-  };
+  // const handleTogglePanel = () => {
+  //   setIsPanelOpen((prevState) => !prevState); // Toggle the panel open/closed state
+  // };
 
   return (
     <div>
-      <LeftPanel isPanelOpen={isPanelOpen} />
-      <Button
+      <LeftPanel />
+      {/* <Button
         variant="contained"
         color="inherit"
         sx={{
@@ -28,12 +27,13 @@ const ObjectToDraw = ({ object }) => {
         onClick={handleTogglePanel}
       >
         {isPanelOpen ? "Close Panel" : "Open Panel"}
-      </Button>
+      </Button> */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: isPanelOpen ? "flex-end" : "center", // Center align the canvas when the panel is closed
+          // alignItems: isPanelOpen ? "flex-end" : "center", // Center align the canvas when the panel is closed
+          alignItems: "center",
         }}
       >
         <div

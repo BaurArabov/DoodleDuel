@@ -3,7 +3,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import axios from "axios";
 import React, { useState } from "react";
 
-const LeftPanel = ({ isPanelOpen }) => {
+const LeftPanel = () => {
   const [genText, setGenText] = useState("");
   const [btnContent, setBtnContent] = useState("Generate");
   const [imageSrc, setImageSrc] = useState(null);
@@ -15,7 +15,7 @@ const LeftPanel = ({ isPanelOpen }) => {
       console.log(response);
       setGenText(response.data);
       setBtnContent("Regenerate");
-      setIsPanelOpen(true); // Open the panel when generate button is clicked
+      // setIsPanelOpen(true); // Open the panel when generate button is clicked
     } catch (error) {
       console.error(error);
     }
@@ -48,7 +48,8 @@ const LeftPanel = ({ isPanelOpen }) => {
           padding: "18px",
           margin: "18px",
           left: 0,
-          display: isPanelOpen ? "block" : "none", // Show/hide the panel based on state
+          // display: isPanelOpen ? "block" : "none", // Show/hide the panel based on state
+          display: "none",
         }}
       >
         <div style={{ marginBottom: "20px" }}>
