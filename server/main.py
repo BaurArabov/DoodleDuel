@@ -33,19 +33,18 @@ app.add_middleware(
 )
 
 
-extractor = AutoFeatureExtractor.from_pretrained("kmewhort/beit-sketch-classifier")
-model = AutoModelForImageClassification.from_pretrained("kmewhort/beit-sketch-classifier")
+
+extractor = AutoFeatureExtractor.from_pretrained("kmewhort/resnet34-sketch-classifier")
+model = AutoModelForImageClassification.from_pretrained("kmewhort/resnet34-sketch-classifier")
 
 @app.post("/recognize")
 async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
-    
     try:
         print("Received image_data_url:", image_data_url)
         # Convert the data URL to an image
         image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
         image = Image.open(io.BytesIO(base64.b64decode(image_data)))
 
-        # Perform image classification
         inputs = extractor(images=image, return_tensors="pt")
         outputs = model(**inputs)
         logits = outputs.logits
@@ -56,4 +55,69 @@ async def recognize_sketch(image_data_url: str = Query(..., description="Data UR
         return {"predicted_class": predicted_class}
     except Exception as e:
         return {"error": "An error occurred during classification."}
+    
+@app.post("/recognizee")
+async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    try:
+        print("Received image_data_url:", image_data_url)
+        # Convert the data URL to an image
+        image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        inputs = extractor(images=image, return_tensors="pt")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        # model predicts one of the 21,841 ImageNet-22k classes
+        predicted_class_idx = logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+#         return {"predicted_class": predicted_class}
+    except Exception as e:
+        return {"error": "An error occurred during classification."}
+
+
+# extractor = AutoFeatureExtractor.from_pretrained("kmewhort/beit-sketch-classifier")
+# model = AutoModelForImageClassification.from_pretrained("kmewhort/beit-sketch-classifier")
+
+# @app.post("/recognize")
+# async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    
+#     try:
+#         print("Received image_data_url:", image_data_url)
+#         # Convert the data URL to an image
+#         image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+#         image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+#         # Perform image classification
+#         inputs = extractor(images=image, return_tensors="pt")
+#         outputs = model(**inputs)
+#         logits = outputs.logits
+#         # model predicts one of the 21,841 ImageNet-22k classes
+#         predicted_class_idx = logits.argmax(-1).item()
+#         predicted_class = model.config.id2label[predicted_class_idx]
+
+#         return {"predicted_class": predicted_class}
+#     except Exception as e:
+#         return {"error": "An error occurred during classification."}
+    
+# @app.post("/recognizee")
+# async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    
+#     try:
+#         print("Received image_data_url:", image_data_url)
+#         # Convert the data URL to an image
+#         image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+#         image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+#         # Perform image classification
+#         inputs = extractor(images=image, return_tensors="pt")
+#         outputs = model(**inputs)
+#         logits = outputs.logits
+#         # model predicts one of the 21,841 ImageNet-22k classes
+#         predicted_class_idx = logits.argmax(-1).item()
+#         predicted_class = model.config.id2label[predicted_class_idx]
+
+#         return {"predicted_class": predicted_class}
+#     except Exception as e:
+#         return {"error": "An error occurred during classification."}
     
