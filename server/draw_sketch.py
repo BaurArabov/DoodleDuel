@@ -1,6 +1,9 @@
+import base64
+import io
 import json
 import os
 import random
+import re
 import time
 
 import cv2
@@ -9,10 +12,11 @@ import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from matplotlib.pyplot import imshow
 from PIL import Image
+from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 app = FastAPI()
 origins = [
@@ -127,28 +131,140 @@ sketchdata = SketchData(dataPath='./datasets')
 category_list = sketchdata.getCategory()
 dataset_origin_list = sketchdata.load()
 
-@app.post("/generate")
-async def generate_sketch_response():
-    try:
+# @app.post("/generate")
+# async def generate_sketch_response():
+#     try:
         
 
+#         response_data = {}
+#         for category_index in range(len(category_list)):
+#             sample_category_name = category_list[category_index]
+#             save_name = sample_category_name.replace(".npz", "")
+#             response_data[save_name] = []
+
+#             drawsketch = FastAPIDrawSketch()
+
+#             for image_index in range(100):
+#                 sample_sketch = dataset_origin_list[category_list.index(sample_category_name)][image_index]
+#                 coordinates_list = drawsketch.draw_three(sample_sketch, True)  # Set random_color=False to use black color
+#                 response_data[save_name].append(coordinates_list)
+
+#         return response_data
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+    
+
+# for exact category which comes from React    
+@app.post("/generate")
+async def generate_sketch_response(category: str = Query(..., title="Category Name")):
+    try:
         response_data = {}
-        for category_index in range(len(category_list)):
-            sample_category_name = category_list[category_index]
-            save_name = sample_category_name.replace(".npz", "")
+        if category in category_list:
+            save_name = category.replace(".npz", "")
             response_data[save_name] = []
 
             drawsketch = FastAPIDrawSketch()
 
-            for image_index in range(2):
-                sample_sketch = dataset_origin_list[category_list.index(sample_category_name)][image_index]
+            for image_index in range(100):
+                sample_sketch = dataset_origin_list[category_list.index(category)][image_index]
                 coordinates_list = drawsketch.draw_three(sample_sketch, True)  # Set random_color=False to use black color
                 response_data[save_name].append(coordinates_list)
 
-        return response_data
+            return response_data
+
+        else:
+            raise HTTPException(status_code=404, detail=f"Category '{category}' not found.")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+        
+extractor = AutoFeatureExtractor.from_pretrained("kmewhort/resnet34-sketch-classifier")
+model = AutoModelForImageClassification.from_pretrained("kmewhort/resnet34-sketch-classifier")
+
+@app.post("/recognize")
+async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    try:
+        print("Received image_data_url:", image_data_url)
+        
+        image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        inputs = extractor(images=image, return_tensors="pt")
+        outputs = model(**inputs)
+        logits = outputs.logits
+
+        predicted_class_idx = logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+        return {"predicted_class": predicted_class}
+    except Exception as e:
+        return {"error": "An error occurred during classification."}
+    
+@app.post("/recognizee")
+async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    try:
+        print("Received image_data_url:", image_data_url)
+
+        image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        inputs = extractor(images=image, return_tensors="pt")
+        outputs = model(**inputs)
+        logits = outputs.logits
+
+        predicted_class_idx = logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+        return {"predicted_class": predicted_class}
+    except Exception as e:
+        return {"error": "An error occurred during classification."}
+        
+new_extractor = AutoFeatureExtractor.from_pretrained("kmewhort/beit-sketch-classifier")
+new_model = AutoModelForImageClassification.from_pretrained("kmewhort/beit-sketch-classifier")
+
+@app.post("/recognizer")
+async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    
+    try:
+        print("Received image_data_url:", image_data_url)
+        # Convert the data URL to an image
+        image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        # Perform image classification
+        inputs = new_extractor(images=image, return_tensors="pt")
+        outputs = new_model(**inputs)
+        logits = outputs.logits
+        # model predicts one of the 21,841 ImageNet-22k classes
+        predicted_class_idx = logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+        return {"predicted_class": predicted_class}
+    except Exception as e:
+        return {"error": "An error occurred during classification."}
+    
+@app.post("/recognizeer")
+async def recognize_sketch(image_data_url: str = Query(..., description="Data URL of the image from the canvas")):
+    
+    try:
+        print("Received image_data_url:", image_data_url)
+        # Convert the data URL to an image
+        image_data = re.sub('^data:image/.+;base64,', '', image_data_url)
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        # Perform image classification
+        inputs = new_extractor(images=image, return_tensors="pt")
+        outputs = new_model(**inputs)
+        logits = outputs.logits
+        # model predicts one of the 21,841 ImageNet-22k classes
+        predicted_class_idx = logits.argmax(-1).item()
+        predicted_class = model.config.id2label[predicted_class_idx]
+
+        return {"predicted_class": predicted_class}
+    except Exception as e:
+        return {"error": "An error occurred during classification."}
+    
 
 # if __name__ == '__main__':
 #     sketchdata = SketchData(dataPath='./datasets')
