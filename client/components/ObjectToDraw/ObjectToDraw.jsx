@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Canvas from "../Canvas/Canvas";
 import LeftPanel from "../LeftPanel/LeftPanel";
 import SketchCanvas from "../SketchCanvas/SketchCanvas";
@@ -11,6 +11,13 @@ const ObjectToDraw = ({ object }) => {
   // const handleTogglePanel = () => {
   //   setIsPanelOpen((prevState) => !prevState); // Toggle the panel open/closed state
   // };
+
+  const [currentWord, setCurrentWord] = useState("Ready to Spin!");
+
+  const [category_user, setCategoryUser] = useState("");
+  const [category_comp, setCategoryComp] = useState("");
+
+  const [isPlay, setPlay] = useState(false);
 
   return (
     <div>
@@ -48,10 +55,24 @@ const ObjectToDraw = ({ object }) => {
           }}
         >
           {/* <h3 style={{ margin: "0" }}>Draw: {object}</h3> */}
-          <WordSlotMachine />
+          <WordSlotMachine
+            currentWord={currentWord}
+            setCurrentWord={setCurrentWord}
+          />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Canvas />
-            <SketchCanvas />
+            <Canvas
+              category_user={category_user}
+              setCategoryUser={setCategoryUser}
+            />
+
+            {category_user === currentWord && "User Won"}
+
+            <SketchCanvas
+              currentWord={currentWord}
+              category_comp={category_comp}
+              setCategoryComp={setCategoryComp}
+            />
+            {category_comp === currentWord && "AI Won"}
           </div>
         </div>
       </div>

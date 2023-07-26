@@ -14,7 +14,7 @@ const theme = createTheme({
   },
 });
 
-function Canvas() {
+function Canvas({ category_user, setCategoryUser }) {
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);
   const prevPointRef = useRef(null);
@@ -41,7 +41,7 @@ function Canvas() {
     const currentLine = historyRef.current[historyRef.current.length - 1];
     currentLine.push({ x: point.x, y: point.y });
 
-    // handleClassify();
+    handleClassify();
   }
 
   function clearCanvas() {
@@ -240,8 +240,6 @@ function Canvas() {
   const getHeight = window.outerHeight * 0.5;
   const getWidth = window.outerWidth * 0.48;
 
-  const [sketchCategory, setCategory] = useState("");
-
   const handleClassify = async () => {
     getDataURL();
     console.log("url of the image" + drawingData);
@@ -256,7 +254,7 @@ function Canvas() {
         }
       );
       console.log(response.data);
-      setCategory(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
+      setCategoryUser(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
     } catch (error) {
       console.error(error);
     }
@@ -406,7 +404,7 @@ function Canvas() {
         </div>
         <div style={{}}>
           {/* Add the ImageUploader component */}
-          {sketchCategory && <p>Predicted Category: {sketchCategory}</p>}
+          {category_user && <p>Predicted Category: {category_user}</p>}
           {/* <ImageUploader onImageUpload={handleImageUpload} /> */}
         </div>
         {isThereImage && <img src={`${drawingData}`} alt="" />}

@@ -1,11 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 
-const SketchCanvas = () => {
+const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [drawingData, setDrawingData] = useState(null);
-  const [category, setCategory] = useState(null);
+
   const [coordinates, setCoordinates] = useState("");
 
   useEffect(() => {
@@ -88,6 +88,8 @@ const SketchCanvas = () => {
     const dataURL = newCanvas.toDataURL("image/jpeg");
     console.log(dataURL);
     setDrawingData(dataURL);
+
+    console.log(drawingData);
     return dataURL;
   };
 
@@ -105,7 +107,7 @@ const SketchCanvas = () => {
         }
       );
       console.log(response.data);
-      setCategory(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
+      setCategoryComp(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
     } catch (error) {
       console.error(error);
     }
@@ -113,9 +115,15 @@ const SketchCanvas = () => {
 
   const handleGenerate = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/generate");
-      console.log(response.data.bus[0]);
-      setCoordinates(response.data.train[1]);
+      const response = await axios.post(
+        "http://localhost:8000/generate",
+        null,
+        { params: { category: currentWord + ".npz" } }
+      );
+      const rnd = Math.floor(Math.random() * 100);
+      console.log(rnd);
+      console.log(response.data[currentWord][rnd]);
+      setCoordinates(response.data[currentWord][rnd]);
     } catch (error) {
       console.error(error);
     }
@@ -158,7 +166,8 @@ const SketchCanvas = () => {
       <button onClick={startDrawing}>Start Drawing</button>
       <button onClick={handleClassify}>Classify</button>
       <button onClick={handleGenerate}>Geneerate</button>
-      {category && <p>Predicted Category: {category}</p>}
+      {category_comp && <p>Predicted Category: {category_comp}</p>}
+      <img src={`${drawingData}`} alt="" />
     </div>
   );
 };

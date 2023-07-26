@@ -12,9 +12,8 @@ const words = [
   "train",
 ];
 
-const WordSlotMachine = () => {
+const WordSlotMachine = ({ currentWord, setCurrentWord }) => {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [currentWord, setCurrentWord] = useState("Ready to Spin!");
 
   const getRandomWord = () => {
     const randomIndex = Math.floor(Math.random() * words.length);
