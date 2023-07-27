@@ -94,6 +94,49 @@ class DrawSketch(object):
                     color = (0, 0, 0)
 
         return coordinates_list
+    
+    def draw_json(self, sketch, random_color=False, img_size=512):
+        thickness = int(img_size * 0.025)
+
+        sketch = self.scale_sketch(sketch, (img_size, img_size))  # scale the sketch.
+        [start_x, start_y, _, _] = self.canvas_size_google(sketch=sketch)
+        start_x += thickness + 1
+        start_y += thickness + 1
+        pen_now = [start_x, start_y]
+        first_zero = False
+
+        json_data = {"lines": [], "mouseUpPoints": []}
+
+        for stroke in sketch:
+            delta_x_y = stroke[0:2]
+            state = int(stroke[2])
+            if first_zero:
+                pen_now[0] += delta_x_y[0]
+                pen_now[1] += delta_x_y[1]
+                first_zero = False
+                continue
+
+            line_data = {
+                "x1": int(pen_now[0]),
+                "y1": int(pen_now[1]),
+                "x2": int(pen_now[0] + delta_x_y[0]),
+                "y2": int(pen_now[1] + delta_x_y[1]),
+                "color": "random" if random_color else "black",
+                "thickness": int(thickness)
+            }
+            json_data["lines"].append(line_data)
+
+            if state == 1:  # mouse up event
+                json_data["mouseUpPoints"].append({
+                    "x": int(pen_now[0] + delta_x_y[0]),
+                    "y": int(pen_now[1] + delta_x_y[1])
+                })
+                first_zero = True
+
+            pen_now[0] += delta_x_y[0]
+            pen_now[1] += delta_x_y[1]
+
+        return json.dumps(json_data)
 
 
 class SketchData(object):
@@ -156,6 +199,29 @@ dataset_origin_list = sketchdata.load()
     
 
 # for exact category which comes from React    
+# @app.post("/generate")
+# async def generate_sketch_response(category: str = Query(..., title="Category Name")):
+#     try:
+#         response_data = {}
+#         if category in category_list:
+#             save_name = category.replace(".npz", "")
+#             response_data[save_name] = []
+
+#             drawsketch = FastAPIDrawSketch()
+
+#             for image_index in range(100):
+#                 sample_sketch = dataset_origin_list[category_list.index(category)][image_index]
+#                 coordinates_list = drawsketch.draw_three(sample_sketch, True)  # Set random_color=False to use black color
+#                 response_data[save_name].append(coordinates_list)
+
+#             return response_data
+
+#         else:
+#             raise HTTPException(status_code=404, detail=f"Category '{category}' not found.")
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/generate")
 async def generate_sketch_response(category: str = Query(..., title="Category Name")):
     try:
@@ -164,12 +230,18 @@ async def generate_sketch_response(category: str = Query(..., title="Category Na
             save_name = category.replace(".npz", "")
             response_data[save_name] = []
 
-            drawsketch = FastAPIDrawSketch()
+            fast_api_drawsketch = FastAPIDrawSketch()  # Create an instance of FastAPIDrawSketch
 
             for image_index in range(100):
                 sample_sketch = dataset_origin_list[category_list.index(category)][image_index]
-                coordinates_list = drawsketch.draw_three(sample_sketch, True)  # Set random_color=False to use black color
-                response_data[save_name].append(coordinates_list)
+                # Get the JSON data using draw_json method of FastAPIDrawSketch
+                json_data = json.loads(fast_api_drawsketch.draw_json(sample_sketch, random_color=True))
+
+                # Append the JSON data to the list for each image
+                response_data[save_name].append({
+                    "lines": json_data["lines"],
+                    "mouseUpPoints": [{"x": point["x"], "y": point["y"]} for point in json_data["mouseUpPoints"]]
+                })
 
             return response_data
 
@@ -178,7 +250,7 @@ async def generate_sketch_response(category: str = Query(..., title="Category Na
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+    
 extractor = AutoFeatureExtractor.from_pretrained("kmewhort/resnet34-sketch-classifier")
 model = AutoModelForImageClassification.from_pretrained("kmewhort/resnet34-sketch-classifier")
 
