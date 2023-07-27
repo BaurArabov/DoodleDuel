@@ -8,45 +8,80 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
 
   const [coordinates, setCoordinates] = useState("");
 
+  const [jsonData, setJsonData] = useState(null);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    // Draw the sketch based on the provided coordinates
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#000";
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let currentCoordinatesIndex = 0;
+    let currentIndex = 0;
+    let currentPointIndex = 0;
 
-    const animateDrawing = () => {
-      if (currentCoordinatesIndex < coordinates.length) {
-        const [x, y] = coordinates[currentCoordinatesIndex];
-        if (currentCoordinatesIndex === 0) {
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-          ctx.stroke();
-        }
-        currentCoordinatesIndex++;
-        setTimeout(animateDrawing, 50); // Add a delay of 50 milliseconds between each coordinate drawing
-
-        // handleClassify();
-      } else {
-        setDrawing(false);
+    const drawNextLine = () => {
+      if (!drawing || currentIndex >= jsonData.lines.length) {
+        return;
       }
+
+      const line = jsonData.lines[currentIndex];
+
+      ctx.beginPath();
+      ctx.moveTo(line.x1, line.y1);
+      ctx.lineTo(line.x2, line.y2);
+      ctx.strokeStyle = line.color;
+      ctx.lineWidth = line.thickness;
+      ctx.stroke();
+
+      currentIndex++;
+      requestAnimationFrame(drawNextLine);
     };
 
-    if (drawing) {
-      animateDrawing();
+    const drawNextPoint = () => {
+      if (!drawing || currentPointIndex >= jsonData.mouseUpPoints.length) {
+        requestAnimationFrame(drawNextLine);
+        return;
+      }
+
+      const point = jsonData.mouseUpPoints[currentPointIndex];
+
+      ctx.fillStyle = "red"; // Set the color for points
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+      ctx.fill();
+
+      currentPointIndex++;
+      requestAnimationFrame(drawNextPoint);
+    };
+
+    // Start the animation when drawing is true and jsonData is available
+    if (drawing && jsonData) {
+      requestAnimationFrame(drawNextPoint);
     }
-  }, [coordinates, drawing]);
+  }, [jsonData, drawing]);
 
   const startDrawing = () => {
     setDrawing(true);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas when "Start Drawing" button is clicked
+  };
+
+  const handleGenerate = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/generate",
+        null,
+        { params: { category: currentWord + ".npz" } }
+      );
+      const rnd = Math.floor(Math.random() * 100);
+      console.log(rnd);
+      console.log(response.data[currentWord][rnd]);
+      setJsonData(response.data[currentWord][rnd]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getDataURL = () => {
@@ -113,21 +148,21 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
     }
   };
 
-  const handleGenerate = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/generate",
-        null,
-        { params: { category: currentWord + ".npz" } }
-      );
-      const rnd = Math.floor(Math.random() * 100);
-      console.log(rnd);
-      console.log(response.data[currentWord][rnd]);
-      setCoordinates(response.data[currentWord][rnd]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const handleGenerate = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:8000/generate",
+  //       null,
+  //       { params: { category: currentWord + ".npz" } }
+  //     );
+  //     const rnd = Math.floor(Math.random() * 100);
+  //     console.log(rnd);
+  //     console.log(response.data[currentWord][rnd]);
+  //     setCoordinates(response.data[currentWord][rnd]);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const getHeight = window.outerHeight * 0.5;
   const getWidth = window.outerWidth * 0.48;

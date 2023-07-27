@@ -1,5 +1,4 @@
 import * as tf from "@tensorflow/tfjs";
-import * as tflite from "@tensorflow/tfjs-converter";
 import Chart from "chart.js/auto";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -357,6 +356,18 @@ const LABELS = [
 
 // Other constants and functions remain the same
 
+// Initialize the Image Classifier method with DoodleNet.
+let classifier;
+
+// A variable to hold the canvas image we want to classify
+let canvas;
+
+// Two variable to hold the label and confidence of the result
+let label;
+let confidence;
+
+function preload() {}
+
 const DrawingPrediction = () => {
   const canvasRef = useRef(null);
   const [pieChart, setPieChart] = useState(null);
@@ -368,16 +379,21 @@ const DrawingPrediction = () => {
   let mousePosition = [];
 
   useEffect(() => {
+    console.log("alala");
+    // Load the DoodleNet Image Classification model
+    classifier = ml5.imageClassifier("DoodleNet");
+    console.log(classifier);
     const loadModel = async () => {
       console.log("Model loading...");
-
-      const loadedModel = await tflite.loadGraphModel(
-        "file:///home/baur/Рабочий стол/nfactorial-incubator/draw-with-ai/client/components/model.tflite"
+      const loadedModel = await tf.loadLayersModel(
+        "https://storage.cloud.google.com/draw_with_ai_bucket/model.json"
       );
-      loadedModel.predict(tf.zeros([1, 28, 28, 1])); // warmup
+      loadedModel.summary();
+      console.log(loadedModel);
+      // loadedModel.predict(tf.zeros([1, 28, 28, 1])); // warmup
 
-      console.log(`Model loaded! (${LABELS.length} classes)`);
-      setModel(loadedModel); // Set the loaded model in the state
+      // console.log(`Model loaded! (${LABELS.length} classes)`);
+      // setModel(loadedModel); // Set the loaded model in the state
     };
 
     loadModel();

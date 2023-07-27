@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// import DrawingCanvas from "../components/JSON_made";
 import ObjectToDraw from "../components/ObjectToDraw/ObjectToDraw";
 import StartPage from "../components/StartPage/StartPage";
 
@@ -22,6 +23,7 @@ const App = () => {
       ) : (
         <StartPage onStart={startGame} />
       )}
+      {/* <DrawingCanvas /> */}
     </div>
   );
 };
