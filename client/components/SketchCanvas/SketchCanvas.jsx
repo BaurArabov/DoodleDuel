@@ -6,22 +6,18 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
   const [drawing, setDrawing] = useState(false);
   const [drawingData, setDrawingData] = useState(null);
 
-  const [coordinates, setCoordinates] = useState("");
-
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     let currentIndex = 0;
     let currentPointIndex = 0;
 
     const drawNextLine = () => {
       if (!drawing || currentIndex >= jsonData.lines.length) {
+        setDrawing(false);
         return;
       }
 
@@ -31,11 +27,12 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
       ctx.moveTo(line.x1, line.y1);
       ctx.lineTo(line.x2, line.y2);
       ctx.strokeStyle = line.color;
-      ctx.lineWidth = line.thickness;
+      ctx.lineWidth = 5;
       ctx.stroke();
 
       currentIndex++;
-      requestAnimationFrame(drawNextLine);
+      // requestAnimationFrame(drawNextLine);
+      setTimeout(drawNextLine, 30);
     };
 
     const drawNextPoint = () => {
@@ -48,6 +45,8 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
 
       ctx.fillStyle = "red"; // Set the color for points
       ctx.beginPath();
+
+      //points || without points
       ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
       ctx.fill();
 
@@ -147,22 +146,6 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
       console.error(error);
     }
   };
-
-  // const handleGenerate = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:8000/generate",
-  //       null,
-  //       { params: { category: currentWord + ".npz" } }
-  //     );
-  //     const rnd = Math.floor(Math.random() * 100);
-  //     console.log(rnd);
-  //     console.log(response.data[currentWord][rnd]);
-  //     setCoordinates(response.data[currentWord][rnd]);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const getHeight = window.outerHeight * 0.5;
   const getWidth = window.outerWidth * 0.48;
