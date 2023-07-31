@@ -41,7 +41,7 @@ function Canvas({ category_user, setCategoryUser }) {
     const currentLine = historyRef.current[historyRef.current.length - 1];
     currentLine.push({ x: point.x, y: point.y });
 
-    handleClassify();
+    // handleClassify();
   }
 
   function clearCanvas() {
@@ -407,7 +407,7 @@ function Canvas({ category_user, setCategoryUser }) {
           {category_user && <p>Predicted Category: {category_user}</p>}
           {/* <ImageUploader onImageUpload={handleImageUpload} /> */}
         </div>
-        {isThereImage && <img src={`${drawingData}`} alt="" />}
+        {/* {isThereImage && <img src={`${drawingData}`} alt="" />} */}
       </div>
     </ThemeProvider>
   );

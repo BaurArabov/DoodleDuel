@@ -37,16 +37,12 @@
         max-width: 430px;
         transform: translateY(-50%) translateX(-50%);
         z-index: 2;
-        filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.3));
+        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.603));
 
         path {
             cursor: pointer;
             animation: blob 2s infinite forwards;
             transform-origin: 50% 50%;
-
-            &:hover {
-                fill: #fafafa;
-            }
         }
 
         text {

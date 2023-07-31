@@ -1,25 +1,28 @@
 import React, { useState } from "react";
-// import DrawingCanvas from "../components/JSON_made";
-import ObjectToDraw from "../components/ObjectToDraw/ObjectToDraw";
 import StartPage from "../components/StartPage/StartPage";
+import WordSlotMachine from "../components/WordSlotMachine/WordSlotMachine";
 
 const App = () => {
   const [gameStarted, setGameStarted] = useState(false);
-  const [objectToDraw, setObjectToDraw] = useState("");
 
   const startGame = () => {
-    // Simulate fetching a random object to draw
-    const objects = ["cat", "tree", "house", "car"];
-    const randomIndex = Math.floor(Math.random() * objects.length);
-    const randomObject = objects[randomIndex];
-    setObjectToDraw(randomObject);
     setGameStarted(true);
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
       {gameStarted ? (
-        <ObjectToDraw object={objectToDraw} />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {/* <ObjectToDraw /> */}
+          <WordSlotMachine />
+        </div>
       ) : (
         <StartPage onStart={startGame} />
       )}

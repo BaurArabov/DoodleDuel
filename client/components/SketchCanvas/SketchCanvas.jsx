@@ -185,7 +185,7 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
       <button onClick={handleClassify}>Classify</button>
       <button onClick={handleGenerate}>Geneerate</button>
       {category_comp && <p>Predicted Category: {category_comp}</p>}
-      <img src={`${drawingData}`} alt="" />
+      {/* <img src={`${drawingData}`} alt="" /> */}
     </div>
   );
 };

@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { Button } from "@mui/material";
+import React, { useState } from "react";
+import ObjectToDraw from "../ObjectToDraw/ObjectToDraw";
+import "./WordSlotMachine.css";
 
 const words = [
   "airplane",
@@ -12,8 +15,12 @@ const words = [
   "train",
 ];
 
-const WordSlotMachine = ({ currentWord, setCurrentWord }) => {
+const WordSlotMachine = () => {
   const [isSpinning, setIsSpinning] = useState(false);
+  const [currentWord, setCurrentWord] = useState("");
+
+  const [revealedWord, setRevealedWord] = useState("");
+  const [isPlay, setPlay] = useState(false);
 
   const getRandomWord = () => {
     const randomIndex = Math.floor(Math.random() * words.length);
@@ -22,52 +29,69 @@ const WordSlotMachine = ({ currentWord, setCurrentWord }) => {
 
   const startSpinning = () => {
     setIsSpinning(true);
-    setCurrentWord("Spinning...");
+    setRevealedWord(""); // Reset revealedWord when spinning starts
 
-    const duration = Math.floor(Math.random() * 2000) + 2000;
+    const duration = Math.floor(Math.random() * 1500);
 
     setTimeout(() => {
       setIsSpinning(false);
-      setCurrentWord(getRandomWord());
+      const newWord = getRandomWord();
+      setCurrentWord(newWord);
+      setRevealedWord(newWord); // Set revealedWord when spinning stops
     }, duration);
   };
 
-  return (
-    <div
-      className="slot-machine"
-      onClick={startSpinning}
-      style={{ cursor: "pointer" }}
-    >
-      {isSpinning ? (
-        <WordSlotMachineSpin />
-      ) : (
-        <div className="slot-machine">Draw: {currentWord}</div>
-      )}
+  const handleCategoryClick = (selectedWord) => {
+    if (!isSpinning) {
+      setCurrentWord(selectedWord);
+      setRevealedWord(selectedWord);
+    }
+  };
+
+  const handlePlay = () => {
+    setPlay(true);
+  };
+
+  return !isPlay ? (
+    <div className="slot-machine">
+      <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
+        Click randomize button to get a category, or select it yourself
+      </h3>
+
+      <div style={{ display: "flex" }}>
+        <div className="slot-machine-images">
+          {words.map((word) => (
+            <img
+              key={word}
+              src={`../../assets/${word}.png`} // Replace with your image URLs for each category
+              alt={word}
+              className={
+                revealedWord === word
+                  ? "revealed"
+                  : isSpinning
+                  ? "spinning"
+                  : ""
+              }
+              onClick={() => handleCategoryClick(word)}
+            />
+          ))}
+        </div>
+        <div className="slot-machine-content">
+          <div className="slot-machine-words">Draw: {currentWord}</div>
+          <div className="slot-machine-buttons">
+            <Button onClick={startSpinning} disabled={isSpinning}>
+              {isSpinning ? "Spinning..." : "Randomize"}
+            </Button>
+            <Button disabled={!revealedWord} onClick={handlePlay}>
+              Start Game
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
+  ) : (
+    <ObjectToDraw currentWord={currentWord} />
   );
 };
 
 export default WordSlotMachine;
-
-const WordSlotMachineSpin = () => {
-  const [currentWord, setCurrentWord] = useState("Loading...");
-
-  useEffect(() => {
-    const getRandomWord = () => {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      return words[randomIndex];
-    };
-
-    const updateSlotMachine = () => {
-      setCurrentWord(getRandomWord());
-    };
-
-    updateSlotMachine();
-
-    const interval = setInterval(updateSlotMachine, 50);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return <div className="slot-machine">Draw: {currentWord}</div>;
-};
