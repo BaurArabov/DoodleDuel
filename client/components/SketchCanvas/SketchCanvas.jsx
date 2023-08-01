@@ -148,7 +148,7 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
   };
 
   const getHeight = window.outerHeight * 0.5;
-  const getWidth = window.outerWidth * 0.48;
+  const getWidth = window.outerWidth * 0.47;
 
   return (
     <div

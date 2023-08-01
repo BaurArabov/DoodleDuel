@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Canvas from "../Canvas/Canvas";
 import SketchCanvas from "../SketchCanvas/SketchCanvas";
-import Winner from "../Winner/Winner";
 // import "./ObjectToDraw.css";
+import Winner from "../Winner/Winner";
 
 const ObjectToDraw = ({ currentWord }) => {
   // const [isPanelOpen, setIsPanelOpen] = useState(false); // Track panel open/closed state
@@ -15,15 +15,22 @@ const ObjectToDraw = ({ currentWord }) => {
   const [category_comp, setCategoryComp] = useState("");
 
   const [winner, setWinner] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     // Check for the winner every time the category_user or category_comp changes
     if (category_user === currentWord) {
       setWinner("User");
+      setShowModal(true);
     } else if (category_comp === currentWord) {
       setWinner("AI");
+      setShowModal(true);
     }
   }, [category_user, category_comp, currentWord]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <div>
@@ -58,18 +65,31 @@ const ObjectToDraw = ({ currentWord }) => {
             setCurrentWord={setCurrentWord}
           /> */}
         <div style={{ fontSize: "30px" }}>Draw: {currentWord}</div>
-        {winner && <Winner winner={winner} />}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Canvas
-            category_user={category_user}
-            setCategoryUser={setCategoryUser}
-          />
+        {showModal && <Winner winner={winner} onClose={handleCloseModal} />}
+        <div
+          style={{
+            position: "relative", // Set the parent container to relative positioning
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Canvas
+              category_user={category_user}
+              setCategoryUser={setCategoryUser}
+              disabled={showModal}
+            />
 
-          <SketchCanvas
-            currentWord={currentWord}
-            category_comp={category_comp}
-            setCategoryComp={setCategoryComp}
-          />
+            <SketchCanvas
+              currentWord={currentWord}
+              category_comp={category_comp}
+              setCategoryComp={setCategoryComp}
+              disabled={showModal}
+            />
+          </div>
         </div>
       </div>
     </div>
