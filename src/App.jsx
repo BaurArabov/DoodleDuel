@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import StartPage from "../components/StartPage/StartPage";
-import WordSlotMachine from "../components/WordSlotMachine/WordSlotMachine";
+import StartPage from "./components/StartPage/StartPage";
+import WordSlotMachine from "./components/WordSlotMachine/WordSlotMachine";
 
 const App = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -15,7 +15,7 @@ const App = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
+        // height: "100vh",
       }}
     >
       {gameStarted ? (

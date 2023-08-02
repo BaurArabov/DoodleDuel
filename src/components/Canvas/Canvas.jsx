@@ -238,7 +238,7 @@ function Canvas({ category_user, setCategoryUser }) {
   // const getWidth = window.outerWidth * 0.55;
 
   const getHeight = window.outerHeight * 0.5;
-  const getWidth = window.outerWidth * 0.47;
+  const getWidth = window.outerWidth * 0.43;
 
   const handleClassify = async () => {
     getDataURL();
@@ -312,7 +312,7 @@ function Canvas({ category_user, setCategoryUser }) {
             </Button>
           )}
 
-          <div style={{ marginRight: "20px" }}>
+          <div style={{ margin: "20px" }}>
             <canvas
               id="responsive-canvas"
               width={getWidth}

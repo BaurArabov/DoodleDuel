@@ -148,7 +148,7 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
   };
 
   const getHeight = window.outerHeight * 0.5;
-  const getWidth = window.outerWidth * 0.47;
+  const getWidth = window.outerWidth * 0.43;
 
   return (
     <div
@@ -169,7 +169,7 @@ const SketchCanvas = ({ currentWord, category_comp, setCategoryComp }) => {
       >
         AI
       </p>
-      <div style={{ marginRight: "20px" }}>
+      <div style={{ margin: "20px" }}>
         <canvas
           ref={canvasRef}
           width={getWidth}

@@ -5,7 +5,6 @@ WORKDIR /client
 
 COPY . .
 
-# COPY frontend/package*.json ./
 RUN npm install
 
 CMD ["npm", "run", "dev"] 

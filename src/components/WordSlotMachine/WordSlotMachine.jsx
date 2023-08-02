@@ -63,7 +63,7 @@ const WordSlotMachine = () => {
           {words.map((word) => (
             <img
               key={word}
-              src={`../../assets/${word}.png`} // Replace with your image URLs for each category
+              src={`../../public//static/images/${word}.png`} // Replace with your image URLs for each category
               alt={word}
               className={
                 revealedWord === word
