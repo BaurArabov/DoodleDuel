@@ -74,7 +74,7 @@ const Timer = () => {
   // by the button
 
   return (
-    <div className="App">
+    <div>
       <h2>{timer}</h2>
     </div>
   );

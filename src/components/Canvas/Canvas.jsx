@@ -14,7 +14,14 @@ const theme = createTheme({
   },
 });
 
-function Canvas({ category_user, setCategoryUser }) {
+const Canvas = ({
+  category_user,
+  setCategoryUser,
+  isUserWon,
+  setUserWins,
+  currentWord,
+  gameOver,
+}) => {
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);
   const prevPointRef = useRef(null);
@@ -25,11 +32,14 @@ function Canvas({ category_user, setCategoryUser }) {
   const [brushSize, setBrushSize] = useState(5);
   const [color, setColor] = useState("#000");
 
+  const [isDrawingInProgress, setDrawingInProgress] = useState(false);
+
   function setCanvasRef(ref) {
     canvasRef.current = ref;
   }
 
   function onCanvasMouseDown(e) {
+    if (gameOver) return;
     isDrawingRef.current = true;
     prevPointRef.current = null;
     historyRef.current.push([]);
@@ -41,7 +51,7 @@ function Canvas({ category_user, setCategoryUser }) {
     const currentLine = historyRef.current[historyRef.current.length - 1];
     currentLine.push({ x: point.x, y: point.y });
 
-    // handleClassify();
+    setDrawingInProgress(true);
   }
 
   function clearCanvas() {
@@ -121,6 +131,10 @@ function Canvas({ category_user, setCategoryUser }) {
     }
 
     function handleTouchEnd() {
+      // handleClassify();
+
+      setDrawingInProgress(false);
+
       isDrawingRef.current = false;
       prevPointRef.current = null;
     }
@@ -137,6 +151,17 @@ function Canvas({ category_user, setCategoryUser }) {
   }, [onDraw]);
 
   useEffect(() => {
+    clearCanvas();
+    setDrawingData(null);
+  }, [isUserWon]);
+
+  useEffect(() => {
+    if (isDrawingInProgress) {
+      // handleClassify();
+    }
+  }, [isDrawingInProgress]);
+
+  useEffect(() => {
     function computePointInCanvas(clientX, clientY) {
       const boundingRect = canvasRef.current.getBoundingClientRect();
       return {
@@ -146,6 +171,7 @@ function Canvas({ category_user, setCategoryUser }) {
     }
 
     function handleMouseMove(e) {
+      if (gameOver) return;
       if (isDrawingRef.current && canvasRef.current) {
         const point = computePointInCanvas(e.clientX, e.clientY);
         const canvasContext = canvasRef.current.getContext("2d");
@@ -155,6 +181,13 @@ function Canvas({ category_user, setCategoryUser }) {
     }
 
     function handleMouseUp() {
+      if (gameOver) return;
+      getDataURL();
+      handleClassify();
+
+      // Set drawing in progress to false
+      setDrawingInProgress(false);
+
       isDrawingRef.current = false;
       prevPointRef.current = null;
     }
@@ -167,8 +200,6 @@ function Canvas({ category_user, setCategoryUser }) {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [onDraw]);
-
-  const [isThereSmthOnCanvas, setSmthOnCanvas] = useState(true);
 
   const getDataURL = () => {
     const canvasElement = canvasRef.current;
@@ -189,8 +220,6 @@ function Canvas({ category_user, setCategoryUser }) {
         .getImageData(0, 0, canvasElement.width, canvasElement.height)
         .data.every((pixel) => pixel === 0)
     ) {
-      setSmthOnCanvas(false);
-      if (!isThereSmthOnCanvas) alert("Draw something");
       return;
     }
 
@@ -241,7 +270,6 @@ function Canvas({ category_user, setCategoryUser }) {
   const getWidth = window.outerWidth * 0.43;
 
   const handleClassify = async () => {
-    getDataURL();
     console.log("url of the image" + drawingData);
     try {
       const response = await axios.post(
@@ -255,6 +283,15 @@ function Canvas({ category_user, setCategoryUser }) {
       );
       console.log(response.data);
       setCategoryUser(response.data.predicted_class); // Assuming the response contains a "predicted_class" field
+      // setTimeout(() => {
+      //   setCategoryUser("");
+      // }, 1000);
+      if (response.data.predicted_class === currentWord) {
+        clearCanvas();
+        setCategoryUser("");
+        setUserWins((prevWins) => prevWins + 1);
+        setDrawingData(null);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -288,30 +325,6 @@ function Canvas({ category_user, setCategoryUser }) {
             alignItems: "center",
           }}
         >
-          {isThereSmthOnCanvas && (
-            <Button
-              variant="outlined"
-              color="error"
-              id="error-button"
-              className="error-button"
-              style={{
-                position: "fixed",
-                top: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
-                backgroundColor: "red",
-                color: "white",
-                padding: "10px 20px",
-                borderRadius: "5px",
-                opacity: 0,
-                transition: "opacity 0.3s ease-in-out",
-                zIndex: 999,
-              }}
-            >
-              Error
-            </Button>
-          )}
-
           <div style={{ margin: "20px" }}>
             <canvas
               id="responsive-canvas"
@@ -330,7 +343,7 @@ function Canvas({ category_user, setCategoryUser }) {
           </div>
 
           <div>
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", width: "300px" }}>
               <Button
                 variant="text"
                 style={{
@@ -352,7 +365,7 @@ function Canvas({ category_user, setCategoryUser }) {
               >
                 Clear
               </Button>
-
+              {/* 
               <Button
                 variant="text"
                 onClick={getDataURL}
@@ -374,7 +387,7 @@ function Canvas({ category_user, setCategoryUser }) {
                 }}
               >
                 Classsify
-              </Button>
+              </Button> */}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <input
@@ -411,7 +424,7 @@ function Canvas({ category_user, setCategoryUser }) {
       </div>
     </ThemeProvider>
   );
-}
+};
 
 export default Canvas;
 
