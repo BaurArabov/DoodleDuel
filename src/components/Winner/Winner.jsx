@@ -22,13 +22,18 @@
 import React from "react";
 import "./Winner.css";
 
-const Winner = ({ winner, onClose }) => {
+const Winner = ({ winner, onClose, onTryAgain }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-content">
           <h2>Winner is {winner}</h2>
-          <button onClick={onClose}>Close</button>
+          <div
+            style={{ display: "flex", justifyContent: "center", gap: "20px" }}
+          >
+            <button onClick={onClose}>Exit</button>
+            <button onClick={onTryAgain}>Try again</button>
+          </div>
         </div>
       </div>
     </div>

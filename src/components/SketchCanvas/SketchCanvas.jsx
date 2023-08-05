@@ -74,6 +74,7 @@ const SketchCanvas = ({
   useEffect(() => {
     if (gameOver) {
       setDrawing(false);
+      // clearCanvas();
     } else if (gameStarted) {
       if (aiWins < 3) {
         // Check if wins are less than 3
@@ -237,6 +238,7 @@ const SketchCanvas = ({
             width: { getWidth },
             border: `3px solid black`,
             borderRadius: "15px",
+            backgroundColor: "#fff",
           }}
         />
       </div>

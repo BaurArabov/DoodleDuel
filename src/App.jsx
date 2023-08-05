@@ -16,17 +16,16 @@ const App = () => {
         justifyContent: "center",
         alignItems: "center",
         // height: "100vh",
+        backgroundColor: "#f48e2a",
       }}
     >
       {gameStarted ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          {/* <ObjectToDraw /> */}
-          <WordSlotMachine />
+          <WordSlotMachine onStart={startGame} />
         </div>
       ) : (
         <StartPage onStart={startGame} />
       )}
-      {/* <DrawingCanvas /> */}
     </div>
   );
 };

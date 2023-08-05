@@ -5,8 +5,16 @@ const StartPage = ({ onStart }) => {
   return (
     <>
       <div className="start-page">
-        <div>
-          <h1>Welcome!</h1>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "cneter",
+            textAlign: "center",
+            gap: "30px",
+          }}
+        >
+          <h1>Battle of Sketches: Challenge the AI!</h1>
         </div>
         <div onClick={onStart}>
           <svg viewBox="45 60 400 320">

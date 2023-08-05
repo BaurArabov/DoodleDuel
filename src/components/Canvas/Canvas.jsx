@@ -337,6 +337,7 @@ const Canvas = ({
                 width: { getWidth },
                 border: "3px solid black",
                 borderRadius: "15px",
+                backgroundColor: "#fff",
               }}
               ref={setCanvasRef}
             />

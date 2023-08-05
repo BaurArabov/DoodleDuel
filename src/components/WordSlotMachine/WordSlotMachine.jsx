@@ -15,7 +15,7 @@ const words = [
   "train",
 ];
 
-const WordSlotMachine = () => {
+const WordSlotMachine = ({ onStart }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentWord, setCurrentWord] = useState("");
 
@@ -90,7 +90,7 @@ const WordSlotMachine = () => {
       </div>
     </div>
   ) : (
-    <ObjectToDraw currentWord={currentWord} />
+    <ObjectToDraw currentWord={currentWord} onStart={onStart} />
   );
 };
 

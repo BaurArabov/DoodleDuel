@@ -4,9 +4,10 @@ import SketchCanvas from "../SketchCanvas/SketchCanvas";
 // import "./ObjectToDraw.css";
 import { Button } from "@mui/material";
 // import Timer from "../Timer/Timer";
+import App from "../../App";
 import Winner from "../Winner/Winner";
 
-const ObjectToDraw = ({ currentWord }) => {
+const ObjectToDraw = ({ currentWord, onStart }) => {
   // const [isPanelOpen, setIsPanelOpen] = useState(false); // Track panel open/closed state
 
   // const handleTogglePanel = () => {
@@ -24,6 +25,8 @@ const ObjectToDraw = ({ currentWord }) => {
 
   const [gameStarted, setGameStarted] = useState(false); // Track if the game has started
   const [gameOver, setGameOver] = useState(false);
+
+  const [isExit, setExit] = useState(false);
 
   useEffect(() => {
     // Check for the winner every time the category_user or category_comp changes
@@ -60,93 +63,156 @@ const ObjectToDraw = ({ currentWord }) => {
     setShowModal(false);
   };
 
+  const handleTryAgain = () => {
+    setAiWins(0);
+    setUserWins(0);
+    setCategoryComp("");
+    setCategoryUser("");
+    setShowModal(false);
+    setGameOver(false);
+    setGameStarted(false);
+  };
+
   const handleStartGame = () => {
     setCategoryUser("");
     setCategoryComp("");
+    setGameOver(false);
     setGameStarted(true); // Set the game started state to true
+  };
+
+  const handlePause = () => {
+    setShowModal(false);
+    setGameOver(true);
+    setGameStarted(false);
   };
 
   console.log("is the game started?? " + gameStarted);
 
   return (
-    <div
-      className="draw-object"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* <WordSlotMachine
+    <>
+      {isExit ? (
+        <App />
+      ) : (
+        <div
+          className="draw-object"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100vh",
+          }}
+        >
+          {/* <WordSlotMachine
             currentWord={currentWord}
             setCurrentWord={setCurrentWord}
           /> */}
-      <div
-        style={{
-          display: "flex",
-          fontSize: "30px",
-          justifyContent: "space-around",
-        }}
-      >
-        <Button variant="contained" onClick={handleStartGame}>
-          Play
-        </Button>
-        {/* <div>{gameStarted ? <Timer /> : <h2>00:30</h2>}</div> */}
-        {/* Render Timer only if the game has started */}
-        Draw: {currentWord}
-      </div>
-
-      {showModal && winner && (
-        <Winner winner={winner} onClose={handleCloseModal} />
-      )}
-      <div style={{ position: "relative" }}>
-        <div
-          style={{
-            display: "flex",
-            width: "100vw",
-            justifyContent: "space-between",
-          }}
-        >
-          <Canvas
-            category_user={category_user}
-            setCategoryUser={setCategoryUser}
-            currentWord={currentWord}
-            setUserWins={setUserWins}
-            gameOver={gameOver}
-          />
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              fontSize: "30px",
+              justifyContent: "space-between",
+              padding: "18px",
             }}
           >
+            <div style={{ display: "flex", gap: "20px" }}>
+              <Button
+                variant="contained"
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  border: "2px",
+                }}
+                onClick={handleStartGame}
+              >
+                Play
+              </Button>
+              <Button
+                variant="contained"
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  border: "2px",
+                }}
+                onClick={handlePause}
+              >
+                Pause
+              </Button>
+            </div>
+            {/* <div>{gameStarted ? <Timer /> : <h2>00:30</h2>}</div> */}
+            Draw: {currentWord}
+            <Button
+              variant="contained"
+              color="error"
+              style={{
+                fontWeight: "bold",
+                fontSize: "18px",
+                border: "2px",
+              }}
+              onClick={() => {
+                setExit(true);
+              }}
+            >
+              Exit
+            </Button>
+          </div>
+
+          {showModal && winner && (
+            <Winner
+              winner={winner}
+              onClose={handleCloseModal}
+              onTryAgain={handleTryAgain}
+            />
+          )}
+          <div style={{ position: "relative" }}>
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                width: "100vw",
+                justifyContent: "space-between",
               }}
             >
-              <div style={{ fontSize: "35px" }}>{winner}</div>
-              <div style={{ fontSize: "80px" }}>
-                {userWins}:{aiWins}
+              <Canvas
+                category_user={category_user}
+                setCategoryUser={setCategoryUser}
+                currentWord={currentWord}
+                setUserWins={setUserWins}
+                gameOver={gameOver}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "35px" }}>{winner}</div>
+                  <div style={{ fontSize: "80px" }}>
+                    {userWins}:{aiWins}
+                  </div>
+                </div>
               </div>
+              <SketchCanvas
+                currentWord={currentWord}
+                category_comp={category_comp}
+                setCategoryComp={setCategoryComp}
+                gameStarted={gameStarted}
+                gameOver={gameOver}
+                setGameStarted={setGameStarted}
+                setAiWins={setAiWins}
+                aiWins={aiWins}
+              />
             </div>
           </div>
-          <SketchCanvas
-            currentWord={currentWord}
-            category_comp={category_comp}
-            setCategoryComp={setCategoryComp}
-            gameStarted={gameStarted}
-            gameOver={gameOver}
-            setGameStarted={setGameStarted}
-            setAiWins={setAiWins}
-            aiWins={aiWins}
-          />
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
