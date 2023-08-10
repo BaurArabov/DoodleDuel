@@ -273,7 +273,7 @@ const Canvas = ({
     console.log("url of the image" + drawingData);
     try {
       const response = await axios.post(
-        "http://localhost:8000/recognize",
+        "https://draw-with-ai.onrender.com/recognize",
         null,
         {
           params: {

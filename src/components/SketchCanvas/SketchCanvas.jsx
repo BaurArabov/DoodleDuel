@@ -96,7 +96,7 @@ const SketchCanvas = ({
   const handleGenerate = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/generate",
+        "https://draw-with-ai.onrender.com/generate",
         null,
         { params: { category: currentWord + ".npz" } }
       );
@@ -160,7 +160,7 @@ const SketchCanvas = ({
     // console.log("url of the image" + drawingData);
     try {
       const response = await axios.post(
-        "http://localhost:8000/recognizee",
+        "https://draw-with-ai.onrender.com/recognizee",
         null,
         {
           params: {
